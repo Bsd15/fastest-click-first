@@ -16,6 +16,7 @@ export class CardsHolderComponent implements OnInit {
   // 1 = Arcade (Time Bound)
   // 2 = Battlefield (3 tries)
   private gameType = 2;
+  private hardness = 6;
   // Used to store the state of the game 
   private isGameActive = false;
   // Count number of missed
@@ -50,7 +51,7 @@ export class CardsHolderComponent implements OnInit {
    * Generate cards based on hardness level.
    */
   generateCards() {
-    for (let index = 1; index <= 4; index++) {
+    for (let index = 1; index <= this.hardness; index++) {
       this.cardsArray.push({
         cardId: index,
         isActive: false
