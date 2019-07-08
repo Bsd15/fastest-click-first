@@ -10,22 +10,40 @@ export class CardsHolderComponent implements OnInit {
   public cardsArray = [];
   // Used to enable and disable chances to player
   // Score is incremented only when chace is true
-  private chance = false;
+  private hasChance = false;
 
+  // Loads the component based on the game type
+  // 1 = Arcade (Time Bound)
+  // 2 = Battlefield (3 tries)
+  private gameType = 2;
+  // Used to store the state of the game 
+  private isGameActive = false;
+  // Count number of missed
+  private misses = 0;
   private selectedCard = {};
   public score = 0;
 
   // Timer function
-  private timeInterval = 1000;
-  private timer: any;
+  private cardClickTimeInterval = 1000;
+  private cardClickTimer: any;
+  // Game Timer
+  private gameTimer: any;
+  // Time Limit for Aracde
+  private gameTimeLimit = 12000;
 
   constructor() { }
 
   ngOnInit() {
     this.generateCards();
-    this.timer = setInterval(() => {
+    if (this.gameType === 1) {
+      this.gameTimer = setTimeout(() => {
+        this.gameOver()
+      }, this.gameTimeLimit);
+    }
+    this.cardClickTimer = setInterval(() => {
       this.pickCard();
-    }, this.timeInterval);
+    }, this.cardClickTimeInterval);
+    this.isGameActive = true;
   }
 
   /**
@@ -46,14 +64,21 @@ export class CardsHolderComponent implements OnInit {
    * @param cardId Id of the card clicked
    */
   cardClicked(cardId: number) {
-    if ((this.selectedCard['cardId'] === cardId) && (this.chance === true)) {
-      this.score++;
-      this.chance = false;
-      clearInterval(this.timer);
-      this.pickCard();
-      this.timer = setInterval(() => {
+    if (this.isGameActive) {
+      if ((this.selectedCard['cardId'] === cardId) && (this.hasChance === true)) {
+        this.score++;
+        this.hasChance = false;
+        clearInterval(this.cardClickTimer);
         this.pickCard();
-      }, this.timeInterval);
+        this.cardClickTimer = setInterval(() => {
+          this.pickCard();
+        }, this.cardClickTimeInterval);
+      } else {
+        this.misses++;
+        if (this.gameType === 2 && this.misses >= 3) {
+          this.gameOver();
+        }
+      }
     }
   }
 
@@ -68,7 +93,7 @@ export class CardsHolderComponent implements OnInit {
     }
     this.selectedCard = card;
     this.selectedCard['isActive'] = true;
-    this.chance = true;
+    this.hasChance = true;
   }
 
   /**
@@ -77,6 +102,18 @@ export class CardsHolderComponent implements OnInit {
    */
   public pickRandomCardId(): number {
     return Math.floor(Math.random() * this.cardsArray.length);
+  }
+
+  /**
+   * Fuction for ending game
+   * Clear the time interval for card click timer
+   * Set the currently selected card to false
+   * set isGameActive to false to prevent click handling.
+   */
+  gameOver() {
+    clearInterval(this.cardClickTimer);
+    this.selectedCard['isActive'] = false;
+    this.isGameActive = false;
   }
 
 }
