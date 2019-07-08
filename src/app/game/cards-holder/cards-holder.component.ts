@@ -8,16 +8,24 @@ import { Component, OnInit } from '@angular/core';
 export class CardsHolderComponent implements OnInit {
 
   public cardsArray = [];
+  // Used to enable and disable chances to player
+  // Score is incremented only when chace is true
+  private chance = false;
 
   private selectedCard = {};
+  public score = 0;
+
+  // Timer function
+  private timeInterval = 1000;
+  private timer: any;
 
   constructor() { }
 
   ngOnInit() {
     this.generateCards();
-    setInterval(() => {
+    this.timer = setInterval(() => {
       this.pickCard();
-    }, 1500);
+    }, this.timeInterval);
   }
 
   /**
@@ -38,7 +46,15 @@ export class CardsHolderComponent implements OnInit {
    * @param cardId Id of the card clicked
    */
   cardClicked(cardId: number) {
-    console.log('From parent' + cardId);
+    if ((this.selectedCard['cardId'] === cardId) && (this.chance === true)) {
+      this.score++;
+      this.chance = false;
+      clearInterval(this.timer);
+      this.pickCard();
+      this.timer = setInterval(() => {
+        this.pickCard();
+      }, this.timeInterval);
+    }
   }
 
   /**
@@ -52,6 +68,7 @@ export class CardsHolderComponent implements OnInit {
     }
     this.selectedCard = card;
     this.selectedCard['isActive'] = true;
+    this.chance = true;
   }
 
   /**

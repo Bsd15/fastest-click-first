@@ -1,3 +1,8 @@
+<div class="score-card">
+    <h1>
+        Score: {{ score }}
+    </h1>
+</div>
 <div *ngFor="let card of cardsArray; let i=index">
     <app-card [cardData]='cardsArray[i]' (sendEventToCardHolder) = 'cardClicked($event)' ></app-card>
 </div>
