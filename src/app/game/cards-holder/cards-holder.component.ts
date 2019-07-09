@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { TimerService } from '../../services/timer.service';
+
 
 @Component({
   selector: 'app-cards-holder',
@@ -15,8 +17,8 @@ export class CardsHolderComponent implements OnInit {
   // Loads the component based on the game type
   // 1 = Arcade (Time Bound)
   // 2 = Battlefield (3 tries)
-  private gameType = 2;
-  private hardness = 6;
+  private gameType = 1;
+  private hardness = 4;
   // Used to store the state of the game 
   private isGameActive = false;
   // Count number of missed
@@ -27,19 +29,21 @@ export class CardsHolderComponent implements OnInit {
   // Timer function
   private cardClickTimeInterval = 1000;
   private cardClickTimer: any;
-  // Game Timer
-  private gameTimer: any;
-  // Time Limit for Aracde
-  private gameTimeLimit = 12000;
 
-  constructor() { }
+  constructor(private timerService: TimerService) { }
 
   ngOnInit() {
     this.generateCards();
+    // Check if game is Battlefield
     if (this.gameType === 1) {
-      this.gameTimer = setTimeout(() => {
-        this.gameOver()
-      }, this.gameTimeLimit);
+      // Start the gametimer
+     this.timerService.startGameTimer();
+     this.timerService.getTimer().subscribe(time => {
+       if (time <= 0) {
+         this.gameOver();
+         this.timerService.stopGameTimer();
+       }
+     });
     }
     this.cardClickTimer = setInterval(() => {
       this.pickCard();
