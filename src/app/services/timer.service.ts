@@ -20,7 +20,7 @@ export class TimerService {
    */
   startGameTimer() {
     // Rxjs Timer function holder
-    this.timerHolder = timer(1000,1000).subscribe(val => {
+    this.timerHolder = timer(1000, 1000).subscribe(val => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
         this.timeHolderSubject.next(this.timeLeft);
@@ -36,9 +36,9 @@ export class TimerService {
     this.timerHolder.unsubscribe();
   }
 
-/**
- * Return an Observable to subscribe to timer.
- */
+  /**
+   * Return an Observable to subscribe to timer.
+   */
   getTimer(): Observable<number> {
     return this.timeHolderSubject.asObservable();
   }
